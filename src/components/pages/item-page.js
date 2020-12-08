@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import WithRestoService from '../hoc/';
 import Spinner from '../spinner';
-import { menuLoaded, menuRequested, menuError } from '../../actions';
+// import { menuLoaded, menuRequested, menuError } from '../../actions';
+import * as actions from '../../actions';
 
 import './item-page.scss';
 
@@ -53,10 +54,11 @@ const mapStateToProps = (state) => {
     }
 }
 
-const mapDispatchToProps = {
-    menuLoaded: menuLoaded,
-    menuRequested,
-    menuError
-}
+// const mapDispatchToProps = {
+//     menuLoaded: menuLoaded,
+//     menuRequested,
+//     menuError
+// }
 
-export default WithRestoService()(connect(mapStateToProps, mapDispatchToProps)(ItemPage));
+// export default WithRestoService()(connect(mapStateToProps, mapDispatchToProps)(ItemPage));
+export default WithRestoService()(connect(mapStateToProps, actions)(ItemPage));
