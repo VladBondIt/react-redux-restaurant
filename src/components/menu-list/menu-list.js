@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import MenuListItem from '../menu-list-item';
 import { connect } from 'react-redux';
 import WithRestoService from '../hoc';
-import * as actions from '../../actions';
+import { menuLoaded, menuRequested, menuError, addedToCart } from '../../actions';
 import Spinner from '../spinner';
 import Error from '../error';
 
@@ -15,14 +15,14 @@ class MenuList extends Component {
 
         // RestoService приходит в пропсы из context Providera на самом верхнем уровне
         const { RestoService } = this.props;
-        // Из метода getMenuItems возвращается промис с данными от сервер
+        // Из метода getMenuItems возвращается промис с данными от сервера
         RestoService.getMenuItems()
             .then(res => this.props.menuLoaded(res))
-            .catch(error => this.props.menuError());
+            .catch(() => this.props.menuError());
     }
 
     render() {
-        const { menuItems, loading, error } = this.props;
+        const { menuItems, loading, error, addedToCart } = this.props;
         if (error) {
             return <Error />
         }
@@ -30,8 +30,10 @@ class MenuList extends Component {
             return <Spinner />
         }
         const items = menuItems.map(menuItem => {
-            return (
-                <MenuListItem key={menuItem.id} menuItem={menuItem} />
+            return (<MenuListItem
+                key={menuItem.id}
+                menuItem={menuItem}
+                onAddToCart={() => addedToCart(menuItem.id)} />
             )
         })
 
@@ -40,7 +42,6 @@ class MenuList extends Component {
         )
     }
 };
-
 // вытаскиваем свойства из глобал стейта и напрявляем их в коннект
 const mapStateToProps = (state) => {
     return {
@@ -51,11 +52,12 @@ const mapStateToProps = (state) => {
 }
 
 // Через диспатч связываем объект с акшонами с редюсером для изменения стейта в сторе.
-// const mapDispatchToProps = {
-//     menuLoaded: menuLoaded,
-//     menuRequested,
-//     menuError
-// }
+const mapDispatchToProps = {
+    menuLoaded: menuLoaded,
+    menuRequested,
+    menuError,
+    addedToCart
+}
 
 
 const View = ({ items }) => {
@@ -67,7 +69,8 @@ const View = ({ items }) => {
     )
 }
 
-// Комопозиция компонентов высшего порядка, коннектом связываем наш компонент с редаксом
+// Комопозиция компонентов высшего порядка, коннектом связываем наш компонент MenuList с редаксом
 // и узываем какие данные нам нужно получить от редакса, какие стейты нам нужны и какие акшоны хотим применить.
-// Такми образом меню лист получает доступ из контекста WithRestoService к сервису
-export default WithRestoService()(connect(mapStateToProps, actions)(MenuList));
+// Таким образом меню лист получает доступ из контекста WithRestoService к сервису без property drilling`a
+
+export default WithRestoService()(connect(mapStateToProps, mapDispatchToProps)(MenuList));

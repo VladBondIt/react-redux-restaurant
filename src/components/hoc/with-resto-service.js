@@ -1,7 +1,7 @@
 import React from 'react';
 import RestoServiceContext from '../resto-service-context';
 
-// Компонент высшего порядка замыкающая фукнция принимает компонент
+// Компонент высшего порядка, функциональная обертка для компонента.
 const WithRestoService = () => (Wrapped) => {
     return (props) => {
         return (

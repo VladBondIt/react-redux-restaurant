@@ -1,20 +1,51 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import { deleteFromCart } from '../../actions'
+import WithRestoService from '../hoc'
 import './cart-table.scss';
 
-const CartTable = () => {
+// Получаем итемы из редакс стора
+const CartTable = ({ items, deleteFromCart }) => {
+    if (items.length === 0) {
+        return (<div className="cart__title"> Ваша корзина пуста :( </div>)
+    }
     return (
         <>
             <div className="cart__title">Ваш заказ:</div>
             <div className="cart__list">
-                <div className="cart__item">
-                    <img src="https://static.1000.menu/img/content/21458/-salat-cezar-s-kr-salat-cezar-s-krevetkami-s-maionezom_1501173720_1_max.jpg" className="cart__item-img" alt="Cesar salad"></img>
-                    <div className="cart__item-title">Cesar salad</div>
-                    <div className="cart__item-price">12$</div>
-                    <div className="cart__close">&times;</div>
-                </div>
+                {
+                    items.map(item => {
+                        const { title, price, url, id, qtty } = item;
+
+                        return (
+                            <div key={id + (Math.random() * 100)} className="cart__item">
+                                <img src={url} className="cart__item-img" alt={title}></img>
+                                <div className="cart__item-title">{title}</div>
+                                <div className="cart__item-price">{price}$ * {qtty}</div>
+                                <div onClick={() => deleteFromCart(id)} className="cart__close">&times;</div>
+                            </div>
+                        )
+                    })
+                }
             </div>
+
         </>
     );
 };
 
-export default CartTable;
+
+
+// Деструктурируем из стейта, штемсы, товары которые добавляются в корзину
+const mapStateToProps = ({ items }) => {
+    // Ключ и значение одинаковое, значит можем записывать в один ключ ES 6
+    return {
+        items
+    }
+}
+
+// Может не принимать Dispatch как аргумент а возвращать что то свое
+const mapDispatchToProps = {
+    deleteFromCart
+}
+
+export default WithRestoService()(connect(mapStateToProps, mapDispatchToProps)(CartTable));

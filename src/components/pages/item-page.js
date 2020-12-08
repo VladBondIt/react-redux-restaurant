@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import WithRestoService from '../hoc/';
 import Spinner from '../spinner';
-// import { menuLoaded, menuRequested, menuError } from '../../actions';
-import * as actions from '../../actions';
+import Error from '../error';
+import { menuLoaded, menuRequested, menuError, addedToCart } from '../../actions';
 
 import './item-page.scss';
 
@@ -21,15 +21,25 @@ class ItemPage extends Component {
     }
 
     render() {
-        if (this.props.loading) {
+        const { loading, error, menuItems } = this.props;
+        if (error) {
+            return (
+                <div className="item_page">
+                    <Error />
+                </div>
+            )
+        }
+        if (loading) {
             return (
                 <div className="item_page">
                     <Spinner />
                 </div>
             )
         }
-        const item = this.props.menuItems.find(el => +el.id === +this.props.match.params.id)
-        const { title, url, category, price } = item;
+        const item = menuItems.find(el => +el.id === +this.props.match.params.id)
+        const { title, url, category, price, id } = item;
+        //console.log(this.props.menuItems)
+
 
         return (
             <div className="item_page">
@@ -38,13 +48,16 @@ class ItemPage extends Component {
                     <img className="menu__img" src={url} alt={title}></img>
                     <div className="menu__category">Category: <span>{category}</span></div>
                     <div className="menu__price">Price: <span>{price}$</span></div>
-                    <button className="menu__btn">Add to cart</button>
+                    <button onClick={() => this.props.addedToCart(id)} className="menu__btn">Add to cart</button>
                     <span className={`menu__category_Img ${category}`}></span>
                 </div>
             </div>
         );
     }
 }
+
+
+
 
 const mapStateToProps = (state) => {
     return {
@@ -54,11 +67,13 @@ const mapStateToProps = (state) => {
     }
 }
 
-// const mapDispatchToProps = {
-//     menuLoaded: menuLoaded,
-//     menuRequested,
-//     menuError
-// }
 
-// export default WithRestoService()(connect(mapStateToProps, mapDispatchToProps)(ItemPage));
-export default WithRestoService()(connect(mapStateToProps, actions)(ItemPage));
+const mapDispatchToProps = {
+    menuLoaded: menuLoaded,
+    menuRequested,
+    menuError,
+    addedToCart
+}
+
+
+export default WithRestoService()(connect(mapStateToProps, mapDispatchToProps)(ItemPage));
